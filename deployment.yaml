@@ -1,0 +1,40 @@
+# Values for the shared "infrastructure" Helm chart (oci://ghcr.io/markmorcos/infrastructure).
+# Deployed by infrastructure/scripts/deploy.sh, which reads version/namespace/project here:
+#   helm upgrade --install datebloom \
+#     oci://ghcr.io/markmorcos/infrastructure --version <version> \
+#     -f deployment.yaml -n datebloom --create-namespace --history-max=3
+
+version: 0.6.2
+
+namespace: datebloom
+project: "datebloom"
+
+services:
+  - name: web
+    image: ghcr.io/markmorcos/datebloom
+    # tag omitted -> chart defaults to "<namespace>-latest" (datebloom-latest)
+    port: 80
+    replicas: 2
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 3
+      periodSeconds: 10
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 15
+    ingress:
+      host: datewithmark.com
+      path: /
+      pathType: Prefix
