@@ -1,7 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { useBookingFlow } from "../../lib/useBookingFlow";
 import { variantA as data } from "../../data/variants";
-import { INVITER_EMAIL, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
+import { INVITER_EMAIL, appleCalDownload, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
 
 /**
  * Variant A — "Warm Romantic"
@@ -11,6 +11,15 @@ export default function VariantA() {
   const flow = useBookingFlow({ setting: "dinner", day: "fri13", time: "7:00 PM" });
   const { step, selection, next, back, select } = flow;
   const choice = resolveChoice(data.settings, data.days, data.times, selection);
+
+  const calEvent = {
+    title: "Our date 💕",
+    iso: choice.day.iso,
+    time: choice.time,
+    details: choice.setting.label,
+    location: "I'll surprise you",
+    guests: [INVITER_EMAIL],
+  };
 
   // Persist the booking once she lands on the confirmation step.
   useEffect(() => {
@@ -203,22 +212,22 @@ export default function VariantA() {
 
             <div class="mt-auto w-full pt-8">
               <a
-                href={googleCalUrl({
-                  title: "Our date 💕",
-                  iso: choice.day.iso,
-                  time: choice.time,
-                  details: choice.setting.label,
-                  guests: [INVITER_EMAIL],
-                })}
+                href={googleCalUrl(calEvent)}
                 target="_blank"
                 rel="noopener"
                 class="block w-full rounded-full bg-[#f26b5e] py-4 text-center text-base font-semibold text-white shadow-lg shadow-[#f26b5e]/30 active:scale-[0.98]"
               >
-                Add to calendar
+                Add to Google Calendar
               </a>
               <button
-                onClick={() => sharePlan(`It's a date — ${choice.setting.label}, ${choice.day.dow} June ${choice.day.dom} at ${choice.time}.`)}
+                onClick={() => appleCalDownload(calEvent)}
                 class="mt-3 block w-full rounded-full border border-[#f26b5e] py-4 text-base font-semibold text-[#f26b5e] active:scale-[0.98]"
+              >
+                Add to Apple Calendar
+              </button>
+              <button
+                onClick={() => sharePlan(`It's a date — ${choice.setting.label}, ${choice.day.dow} June ${choice.day.dom} at ${choice.time}.`)}
+                class="mt-3 block w-full py-2 text-center text-sm font-medium text-[#9a7a70] active:scale-[0.98]"
               >
                 Share the plan
               </button>

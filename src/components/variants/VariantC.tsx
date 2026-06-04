@@ -1,7 +1,7 @@
 import { useEffect } from "preact/hooks";
 import { useBookingFlow } from "../../lib/useBookingFlow";
 import { variantC as data } from "../../data/variants";
-import { INVITER_EMAIL, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
+import { INVITER_EMAIL, appleCalDownload, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
 
 /**
  * Variant C — "Editorial Minimal"
@@ -13,6 +13,14 @@ export default function VariantC() {
   const choice = resolveChoice(data.settings, data.days, data.times, selection);
 
   const gold = "#a8893f";
+
+  const calEvent = {
+    title: "An evening together",
+    iso: choice.day.iso,
+    time: choice.time,
+    details: choice.setting.label,
+    guests: [INVITER_EMAIL],
+  };
 
   // Persist the booking once she lands on the confirmation step.
   useEffect(() => {
@@ -196,22 +204,22 @@ export default function VariantC() {
 
             <div class="mt-auto w-full pt-8">
               <a
-                href={googleCalUrl({
-                  title: "An evening together",
-                  iso: choice.day.iso,
-                  time: choice.time,
-                  details: choice.setting.label,
-                  guests: [INVITER_EMAIL],
-                })}
+                href={googleCalUrl(calEvent)}
                 target="_blank"
                 rel="noopener"
                 class="block w-full rounded-md bg-[#272019] py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-[#efe9dd] active:scale-[0.98]"
               >
-                Add to calendar
+                Google Calendar
               </a>
               <button
+                onClick={() => appleCalDownload(calEvent)}
+                class="mt-3 block w-full rounded-md border border-[#1f1b16]/25 py-4 text-sm font-medium uppercase tracking-[0.15em] text-[#1f1b16] active:scale-[0.98]"
+              >
+                Apple Calendar
+              </button>
+              <button
                 onClick={() => sharePlan(`Confirmed — ${choice.setting.label}, ${choice.day.dow} June ${choice.day.dom} at ${choice.time}.`)}
-                class="mt-3 block w-full rounded-md border border-[#1f1b16]/20 py-4 text-sm font-medium text-[#1f1b16] active:scale-[0.98]"
+                class="mt-3 block w-full py-2 text-center text-sm font-medium text-[#6b6253] active:scale-[0.98]"
               >
                 Share
               </button>

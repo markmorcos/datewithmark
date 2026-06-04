@@ -52,6 +52,56 @@ export function googleCalUrl(e: CalEvent): string {
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+function icsStamp(iso: string, time: string, addMinutes = 0): string {
+  const [h, min] = to24h(time);
+  const [y, mo, d] = iso.split("-").map(Number);
+  const total = h * 60 + min + addMinutes;
+  const eh = Math.floor(total / 60) % 24;
+  const em = total % 60;
+  return `${y}${pad(mo)}${pad(d)}T${pad(eh)}${pad(em)}00`;
+}
+
+function icsEscape(s: string): string {
+  return s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+}
+
+/** Build an iCalendar (.ics) document for the event (floating local time). */
+export function buildIcs(e: CalEvent): string {
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Date with Mark//EN",
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
+    `UID:${e.iso}-${e.time.replace(/[^0-9]/g, "")}@datewithmark.com`,
+    `DTSTAMP:${icsStamp(e.iso, e.time)}`,
+    `DTSTART:${icsStamp(e.iso, e.time)}`,
+    `DTEND:${icsStamp(e.iso, e.time, 90)}`,
+    `SUMMARY:${icsEscape(e.title)}`,
+    e.details ? `DESCRIPTION:${icsEscape(e.details)}` : "",
+    e.location ? `LOCATION:${icsEscape(e.location)}` : "",
+    e.guests?.length ? `ORGANIZER;CN=${e.guests[0]}:mailto:${e.guests[0]}` : "",
+    ...(e.guests ?? []).map((g) => `ATTENDEE;CN=${g};RSVP=TRUE:mailto:${g}`),
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].filter(Boolean);
+  return lines.join("\r\n");
+}
+
+/** Download an .ics file — opens directly in Apple Calendar on macOS/iOS. */
+export function appleCalDownload(e: CalEvent) {
+  if (typeof document === "undefined") return;
+  const blob = new Blob([buildIcs(e)], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "date-with-mark.ics";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
 export interface StoredBooking {
   variant: string;
   setting: string;
