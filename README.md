@@ -19,7 +19,9 @@ the **same state machine** — only the skin and copy differ.
 - **[Preact](https://preactjs.com)** islands — one small island per variant for the
   interactive flow (`client:load`).
 - **[Tailwind CSS v4](https://tailwindcss.com)** via `@tailwindcss/vite`.
-- Deploys to **Cloudflare Pages** by serving the static `dist/` (no SSR adapter needed).
+- Built to a static `dist/`, baked into an **nginx** container, and served from the
+  self-hosted **k8s cluster** (node `m720q`). **Cloudflare = DNS only** (it points
+  `datewithmark.com` at the cluster ingress; no CF Pages, no SSR adapter).
 
 ## Develop
 
@@ -73,6 +75,27 @@ To avoid a flash, gate the islands behind the resolved value (render nothing unt
 GrowthBook returns) or persist the assignment in a cookie/localStorage so repeat
 visits are instant. Bucketing reporting (`gb.setTrackingCallback`) is where the A/B/C
 exposure event gets sent to your analytics.
+
+## Deploy
+
+Served from the self-hosted cluster (node `m720q`), not Cloudflare Pages —
+Cloudflare only hosts DNS for `datewithmark.com`, pointing it at the cluster's
+nginx ingress.
+
+1. **Image** — CI builds the [`Dockerfile`](Dockerfile) (Astro build → nginx) and
+   pushes `ghcr.io/markmorcos/datewithmark:datewithmark-latest`.
+2. **Release** — [`deployment.yaml`](deployment.yaml) is the values file for the shared
+   `infrastructure` chart. `infrastructure/scripts/deploy.sh` reads `version` /
+   `namespace` / `project` from it and runs:
+
+   ```bash
+   helm upgrade --install datewithmark \
+     oci://ghcr.io/markmorcos/infrastructure --version 0.6.2 \
+     -f deployment.yaml -n datewithmark --create-namespace --history-max=3
+   ```
+
+   The chart emits the Deployment, Service, and Ingress (TLS via cert-manager,
+   `www` → apex redirect) for `datewithmark.com`.
 
 ## Project layout
 
