@@ -1,29 +1,30 @@
 ---
-import { resolveVariant, variantPath } from "../lib/variant";
+import Base from "../layouts/Base.astro";
+import VariantA from "../components/variants/VariantA.tsx";
+import VariantB from "../components/variants/VariantB.tsx";
+import VariantC from "../components/variants/VariantC.tsx";
+import { resolveVariant } from "../lib/variant";
+import { VARIANT_FONT, VARIANT_TITLE } from "../lib/variantMeta";
 
-// The variant is resolved here. With the hard-coded flag this happens at BUILD
-// time and bakes a redirect to the chosen variant into the static index page.
+// Render the resolved variant IN PLACE at "/" — no redirect.
+// With the hard-coded flag this is evaluated at BUILD time, so "/" is a static
+// page that contains only the chosen variant (and only that variant's island
+// + font ship to the browser).
 //
-// To run the real experiment later, do the assignment per-visitor instead:
-//   • Edge (no flicker, preferred): a Cloudflare Pages Function at functions/index.ts
-//     evaluates GrowthBook, sets a sticky cookie, and 302s to /a | /b | /c.
-//   • Client: move resolveVariant() into the inline <script> below.
-// Either way the /a /b /c routes and all variant code stay untouched.
-const target = variantPath(resolveVariant());
+// Later (GrowthBook A/B/C): assign per-visitor at the edge with a Cloudflare
+// Pages Function that internally REWRITES "/" to the pre-rendered /a | /b | /c
+// asset (the URL stays "/", still no client redirect). Only that function +
+// resolveVariant() change; every variant component stays untouched.
+const variant = resolveVariant();
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="refresh" content={`0; url=${target}`} />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Datebloom</title>
-    <script is:inline define:vars={{ target }}>
-      location.replace(target);
-    </script>
-  </head>
-  <body>
-    <p>Redirecting… <a href={target}>continue</a></p>
-  </body>
-</html>
+<Base title={VARIANT_TITLE[variant]}>
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href={VARIANT_FONT[variant]} rel="stylesheet" />
+  </Fragment>
+  {variant === "A" && <VariantA client:load />}
+  {variant === "B" && <VariantB client:load />}
+  {variant === "C" && <VariantC client:load />}
+</Base>

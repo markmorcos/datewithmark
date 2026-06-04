@@ -32,7 +32,7 @@ npm run preview  # serve the build locally
 
 Routes:
 
-- `/` — resolver: redirects to the active variant (from the flag).
+- `/` — renders the active variant in place (from the flag); no redirect.
 - `/a`, `/b`, `/c` — the three concepts directly (handy for review / QA).
 
 ## The variant flag (the important bit)
@@ -47,37 +47,39 @@ export function resolveVariant(): Variant {
 }
 ```
 
-`src/pages/index.astro` calls `resolveVariant()` at build time and bakes a redirect
-to `/a | /b | /c`. To preview another concept, change the flag and rebuild (or just
-visit the route directly).
+`src/pages/index.astro` calls `resolveVariant()` at build time and renders the chosen
+variant **in place** — `/` is a static page containing only that variant (no redirect).
+To preview another concept, change the flag and rebuild (or just visit `/a` `/b` `/c`).
 
 ## Swapping in GrowthBook (later)
 
 Create a GrowthBook feature **`booking-ux`** with string value `A` / `B` / `C` (or an
 experiment with those variations). Then pick one of:
 
-**Option 1 — Edge assignment (preferred, no flicker).** Add a Cloudflare Pages
-Function `functions/index.ts` that evaluates GrowthBook per request, sets a sticky
-cookie, and redirects to the assigned route. The static `/a /b /c` pages and all
+**Option 1 — Edge assignment (preferred, no flicker, URL stays `/`).** Add a
+Cloudflare Pages Function `functions/index.ts` that evaluates GrowthBook per request,
+sets a sticky cookie, and internally **rewrites** `/` to the pre-rendered `/a | /b | /c`
+asset (no redirect — the address bar stays `/`). The static variant pages and all
 variant code stay exactly as they are.
 
 ```ts
 // functions/index.ts (sketch)
 import { GrowthBook } from "@growthbook/growthbook";
-export const onRequestGet: PagesFunction = async ({ request }) => {
+export const onRequestGet: PagesFunction = async ({ request, env, next }) => {
   const cookie = /* read "db_variant" from request headers */;
   const gb = new GrowthBook({ apiHost, clientKey, attributes: { id: visitorId } });
   await gb.init({ timeout: 1000 });
   const v = (cookie ?? gb.getFeatureValue("booking-ux", "A")).toLowerCase();
-  return new Response(null, {
-    status: 302,
-    headers: { Location: `/${v}`, "Set-Cookie": `db_variant=${v}; Path=/; Max-Age=2592000` },
-  });
+  // Serve the pre-rendered variant asset at "/" (internal rewrite, not a redirect)
+  const res = await env.ASSETS.fetch(new URL(`/${v}`, request.url));
+  const out = new Response(res.body, res);
+  out.headers.append("Set-Cookie", `db_variant=${v}; Path=/; Max-Age=2592000`);
+  return out;
 };
 ```
 
-**Option 2 — Client assignment.** Move the GrowthBook lookup into `resolveVariant()`
-(or the inline script in `index.astro`) and redirect on the client.
+**Option 2 — Client assignment.** Render all three islands at `/` and have the
+GrowthBook lookup in `resolveVariant()` pick which one mounts on the client.
 
 Either way, **only the resolver changes.** `npm i @growthbook/growthbook` to add the SDK.
 

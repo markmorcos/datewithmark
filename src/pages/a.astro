@@ -1,16 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
 import VariantA from "../components/variants/VariantA.tsx";
+import { VARIANT_FONT, VARIANT_TITLE } from "../lib/variantMeta";
 ---
 
-<Base title="Will you go out with me? · Datebloom">
+<Base title={VARIANT_TITLE.A}>
   <Fragment slot="head">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,900&display=swap"
-      rel="stylesheet"
-    />
+    <link href={VARIANT_FONT.A} rel="stylesheet" />
   </Fragment>
   <VariantA client:load />
 </Base>
