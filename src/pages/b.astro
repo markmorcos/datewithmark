@@ -1,0 +1,16 @@
+---
+import Base from "../layouts/Base.astro";
+import VariantB from "../components/variants/VariantB.tsx";
+---
+
+<Base title="so... dinner? · Datebloom">
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+  </Fragment>
+  <VariantB client:load />
+</Base>

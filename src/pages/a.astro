@@ -1,0 +1,16 @@
+---
+import Base from "../layouts/Base.astro";
+import VariantA from "../components/variants/VariantA.tsx";
+---
+
+<Base title="Will you go out with me? · Datebloom">
+  <Fragment slot="head">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,900&display=swap"
+      rel="stylesheet"
+    />
+  </Fragment>
+  <VariantA client:load />
+</Base>

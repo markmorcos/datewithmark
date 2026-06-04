@@ -1,0 +1,22 @@
+{
+  "name": "datebloom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/preact": "^4.1.0",
+    "@tailwindcss/vite": "^4.1.13",
+    "astro": "^5.14.1",
+    "preact": "^10.27.2",
+    "tailwindcss": "^4.1.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}
