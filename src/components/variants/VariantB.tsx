@@ -30,12 +30,8 @@ export default function VariantB() {
   );
 
   return (
-    <div class="font-grotesk min-h-screen w-full bg-gradient-to-b from-[#241a44] via-[#1a1230] to-[#0f0a1e] text-white">
-      <div class="mx-auto flex min-h-screen w-full max-w-md flex-col px-7 pb-10 pt-14">
-        <div class="mb-6 flex items-center justify-between text-sm font-medium text-white/70">
-          <span>9:41</span>
-          <span>•••</span>
-        </div>
+    <div class="font-grotesk flex min-h-screen w-full items-center justify-center bg-[#070512] sm:py-8">
+      <div class="relative flex min-h-screen w-full max-w-md flex-col overflow-hidden bg-gradient-to-b from-[#241a44] via-[#1a1230] to-[#0f0a1e] px-7 pb-10 pt-12 text-white sm:min-h-[780px] sm:rounded-[2.5rem] sm:shadow-2xl">
 
         {step === "invite" && (
           <div class="flex flex-1 flex-col">

@@ -30,13 +30,8 @@ export default function VariantA() {
   );
 
   return (
-    <div class="font-sans min-h-screen w-full bg-gradient-to-b from-[#fdeee7] via-[#fde2d6] to-[#fbd5c4] text-[#3a241e]">
-      <div class="mx-auto flex min-h-screen w-full max-w-md flex-col px-7 pb-10 pt-14">
-        {/* status bar mimic */}
-        <div class="mb-6 flex items-center justify-between text-sm font-medium text-[#3a241e]/80">
-          <span>9:41</span>
-          <span class="tracking-widest text-[#f26b5e]">◆◆◆</span>
-        </div>
+    <div class="font-sans flex min-h-screen w-full items-center justify-center bg-[#e7d0c4] sm:py-8">
+      <div class="relative flex min-h-screen w-full max-w-md flex-col overflow-hidden bg-gradient-to-b from-[#fdeee7] via-[#fde2d6] to-[#fbd5c4] px-7 pb-10 pt-12 text-[#3a241e] sm:min-h-[780px] sm:rounded-[2.5rem] sm:shadow-2xl">
 
         {step === "invite" && (
           <div class="flex flex-1 flex-col items-center justify-center text-center">
