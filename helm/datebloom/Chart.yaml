@@ -1,0 +1,11 @@
+apiVersion: v2
+name: datebloom
+description: Datebloom — date invitation & booking UX, served as a static site behind nginx
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - datebloom
+  - astro
+  - static-site
+home: https://datewithmark.com
