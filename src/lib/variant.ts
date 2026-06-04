@@ -12,7 +12,7 @@ export type Variant = "A" | "B" | "C";
 export const VARIANTS: readonly Variant[] = ["A", "B", "C"] as const;
 
 /** Flip this to "A" | "B" | "C" to preview a different concept, then rebuild. */
-const HARDCODED_VARIANT: Variant = "A";
+const HARDCODED_VARIANT: Variant = "B";
 
 /**
  * Resolve the active variant.

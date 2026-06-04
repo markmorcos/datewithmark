@@ -1,11 +1,20 @@
 import type { DayOption, SettingOption } from "./types";
 
+/**
+ * The inviter's email. Added as a guest on the Google Calendar event so the
+ * inviter is notified the moment the invitee saves it. (Later this could come
+ * from a per-invite link/config instead of a constant.)
+ */
+export const INVITER_EMAIL = "mark.yehia@gmail.com";
+
 export interface CalEvent {
   title: string;
   iso: string; // YYYY-MM-DD
   time: string; // e.g. "7:00 PM"
   details?: string;
   location?: string;
+  /** Emails to invite as guests (e.g. the inviter). */
+  guests?: string[];
 }
 
 function to24h(t: string): [number, number] {
@@ -38,7 +47,31 @@ export function googleCalUrl(e: CalEvent): string {
     details: e.details ?? "",
     location: e.location ?? "",
   });
+  // `add` pre-fills the guest list; Google invites them when the event is saved.
+  if (e.guests?.length) params.set("add", e.guests.join(","));
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+export interface StoredBooking {
+  variant: string;
+  setting: string;
+  day: string;
+  time: string;
+  iso: string;
+}
+
+/** Persist a confirmed booking to localStorage (history + last booking). */
+export function saveBooking(b: StoredBooking) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const KEY = "datebloom:bookings";
+    const list = JSON.parse(localStorage.getItem(KEY) ?? "[]") as unknown[];
+    list.push({ ...b, savedAt: new Date().toISOString() });
+    localStorage.setItem(KEY, JSON.stringify(list));
+    localStorage.setItem("datebloom:lastBooking", JSON.stringify(b));
+  } catch {
+    /* storage unavailable (private mode / quota) — non-fatal */
+  }
 }
 
 /** Resolve the human-readable bits of a selection for display + calendar. */

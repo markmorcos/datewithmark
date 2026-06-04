@@ -1,6 +1,7 @@
+import { useEffect } from "preact/hooks";
 import { useBookingFlow } from "../../lib/useBookingFlow";
 import { variantC as data } from "../../data/variants";
-import { googleCalUrl, resolveChoice, sharePlan } from "../../lib/share";
+import { INVITER_EMAIL, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
 
 /**
  * Variant C — "Editorial Minimal"
@@ -12,6 +13,18 @@ export default function VariantC() {
   const choice = resolveChoice(data.settings, data.days, data.times, selection);
 
   const gold = "#a8893f";
+
+  // Persist the booking once she lands on the confirmation step.
+  useEffect(() => {
+    if (step !== "confirm") return;
+    saveBooking({
+      variant: "C",
+      setting: choice.setting.label,
+      day: `${choice.day.dow} June ${choice.day.dom}`,
+      time: choice.time,
+      iso: choice.day.iso,
+    });
+  }, [step]);
 
   const Segments = ({ active }: { active: number }) => (
     <div class="flex gap-2">
@@ -34,7 +47,7 @@ export default function VariantC() {
   return (
     <div class="font-sans flex min-h-screen w-full items-center justify-center bg-[#e0d7c6] sm:py-8">
       <div class="relative flex min-h-screen w-full max-w-md flex-col overflow-hidden bg-[#efe9dd] px-7 pb-10 pt-12 text-[#1f1b16] sm:min-h-[780px] sm:rounded-[2.5rem] sm:shadow-2xl">
-
+        <div key={step} class="step-enter flex flex-1 flex-col">
         {step === "invite" && (
           <div class="flex flex-1 flex-col">
             <div class="mt-auto">
@@ -188,6 +201,7 @@ export default function VariantC() {
                   iso: choice.day.iso,
                   time: choice.time,
                   details: choice.setting.label,
+                  guests: [INVITER_EMAIL],
                 })}
                 target="_blank"
                 rel="noopener"
@@ -204,6 +218,7 @@ export default function VariantC() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

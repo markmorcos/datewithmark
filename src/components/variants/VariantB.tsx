@@ -1,6 +1,7 @@
+import { useEffect, useState } from "preact/hooks";
 import { useBookingFlow } from "../../lib/useBookingFlow";
 import { variantB as data } from "../../data/variants";
-import { googleCalUrl, resolveChoice, sharePlan } from "../../lib/share";
+import { INVITER_EMAIL, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
 
 /**
  * Variant B — "Neon Playful"
@@ -10,6 +11,26 @@ export default function VariantB() {
   const flow = useBookingFlow({ setting: "dinner", day: "fri13", time: "7:30 PM" });
   const { step, selection, next, back, select } = flow;
   const choice = resolveChoice(data.settings, data.days, data.times, selection);
+
+  // The "hmm, no" button dodges so it can't be pressed.
+  const [noPos, setNoPos] = useState({ x: 0, y: 0 });
+  const dodge = () =>
+    setNoPos({
+      x: Math.round((Math.random() - 0.5) * 220),
+      y: Math.round((Math.random() - 0.5) * 90),
+    });
+
+  // Persist the booking once she lands on the confirmation step.
+  useEffect(() => {
+    if (step !== "confirm") return;
+    saveBooking({
+      variant: "B",
+      setting: choice.setting.label,
+      day: `${choice.day.dow} June ${choice.day.dom}`,
+      time: choice.time,
+      iso: choice.day.iso,
+    });
+  }, [step]);
 
   const Segments = ({ active }: { active: number }) => (
     <div class="flex gap-1.5">
@@ -32,7 +53,7 @@ export default function VariantB() {
   return (
     <div class="font-grotesk flex min-h-screen w-full items-center justify-center bg-[#070512] sm:py-8">
       <div class="relative flex min-h-screen w-full max-w-md flex-col overflow-hidden bg-gradient-to-b from-[#241a44] via-[#1a1230] to-[#0f0a1e] px-7 pb-10 pt-12 text-white sm:min-h-[780px] sm:rounded-[2.5rem] sm:shadow-2xl">
-
+        <div key={step} class="step-enter flex flex-1 flex-col">
         {step === "invite" && (
           <div class="flex flex-1 flex-col">
             <div class="mt-auto">
@@ -52,7 +73,23 @@ export default function VariantB() {
               >
                 YES obviously
               </button>
-              <button onClick={next} class="mt-4 block w-full text-center text-sm lowercase text-white/40">
+              <button
+                onPointerEnter={dodge}
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  dodge();
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  dodge();
+                }}
+                onClick={(e) => e.preventDefault()}
+                style={{
+                  transform: `translate(${noPos.x}px, ${noPos.y}px)`,
+                  transition: "transform 0.18s ease",
+                }}
+                class="relative mt-4 block w-full text-center text-sm lowercase text-white/40"
+              >
                 hmm, no
               </button>
             </div>
@@ -196,6 +233,7 @@ export default function VariantB() {
                   iso: choice.day.iso,
                   time: choice.time,
                   details: choice.setting.label,
+                  guests: [INVITER_EMAIL],
                 })}
                 target="_blank"
                 rel="noopener"
@@ -212,6 +250,7 @@ export default function VariantB() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
+import { useEffect } from "preact/hooks";
 import { useBookingFlow } from "../../lib/useBookingFlow";
 import { variantA as data } from "../../data/variants";
-import { googleCalUrl, resolveChoice, sharePlan } from "../../lib/share";
+import { INVITER_EMAIL, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
 
 /**
  * Variant A — "Warm Romantic"
@@ -10,6 +11,18 @@ export default function VariantA() {
   const flow = useBookingFlow({ setting: "dinner", day: "fri13", time: "7:00 PM" });
   const { step, selection, next, back, select } = flow;
   const choice = resolveChoice(data.settings, data.days, data.times, selection);
+
+  // Persist the booking once she lands on the confirmation step.
+  useEffect(() => {
+    if (step !== "confirm") return;
+    saveBooking({
+      variant: "A",
+      setting: choice.setting.label,
+      day: `${choice.day.dow} June ${choice.day.dom}`,
+      time: choice.time,
+      iso: choice.day.iso,
+    });
+  }, [step]);
 
   const Dots = ({ active }: { active: number }) => (
     <div class="flex gap-1.5">
@@ -32,7 +45,7 @@ export default function VariantA() {
   return (
     <div class="font-sans flex min-h-screen w-full items-center justify-center bg-[#e7d0c4] sm:py-8">
       <div class="relative flex min-h-screen w-full max-w-md flex-col overflow-hidden bg-gradient-to-b from-[#fdeee7] via-[#fde2d6] to-[#fbd5c4] px-7 pb-10 pt-12 text-[#3a241e] sm:min-h-[780px] sm:rounded-[2.5rem] sm:shadow-2xl">
-
+        <div key={step} class="step-enter flex flex-1 flex-col">
         {step === "invite" && (
           <div class="flex flex-1 flex-col items-center justify-center text-center">
             <p class="mb-6 text-xs font-semibold uppercase tracking-[0.3em] text-[#c2614f]">
@@ -195,6 +208,7 @@ export default function VariantA() {
                   iso: choice.day.iso,
                   time: choice.time,
                   details: choice.setting.label,
+                  guests: [INVITER_EMAIL],
                 })}
                 target="_blank"
                 rel="noopener"
@@ -211,6 +225,7 @@ export default function VariantA() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
