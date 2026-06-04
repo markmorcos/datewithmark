@@ -32,8 +32,8 @@ npm run preview  # serve the build locally
 
 Routes:
 
-- `/` — renders the active variant in place (from the flag); no redirect.
-- `/a`, `/b`, `/c` — the three concepts directly (handy for review / QA).
+- `/` — the only route. Renders the active variant in place (from the flag); no redirect.
+  To review another concept, flip the flag and rebuild.
 
 ## The variant flag (the important bit)
 
@@ -49,39 +49,30 @@ export function resolveVariant(): Variant {
 
 `src/pages/index.astro` calls `resolveVariant()` at build time and renders the chosen
 variant **in place** — `/` is a static page containing only that variant (no redirect).
-To preview another concept, change the flag and rebuild (or just visit `/a` `/b` `/c`).
+To preview another concept, change the flag and rebuild.
 
 ## Swapping in GrowthBook (later)
 
 Create a GrowthBook feature **`booking-ux`** with string value `A` / `B` / `C` (or an
-experiment with those variations). Then pick one of:
+experiment with those variations), then `npm i @growthbook/growthbook`.
 
-**Option 1 — Edge assignment (preferred, no flicker, URL stays `/`).** Add a
-Cloudflare Pages Function `functions/index.ts` that evaluates GrowthBook per request,
-sets a sticky cookie, and internally **rewrites** `/` to the pre-rendered `/a | /b | /c`
-asset (no redirect — the address bar stays `/`). The static variant pages and all
-variant code stay exactly as they are.
+Since `/` is the only route, assign the variant **per-visitor on the client**: render
+all three islands at `/` and let the GrowthBook value decide which one mounts. The
+variant components stay exactly as they are — only `index.astro`'s render gate and
+`resolveVariant()` change.
 
-```ts
-// functions/index.ts (sketch)
-import { GrowthBook } from "@growthbook/growthbook";
-export const onRequestGet: PagesFunction = async ({ request, env, next }) => {
-  const cookie = /* read "db_variant" from request headers */;
-  const gb = new GrowthBook({ apiHost, clientKey, attributes: { id: visitorId } });
-  await gb.init({ timeout: 1000 });
-  const v = (cookie ?? gb.getFeatureValue("booking-ux", "A")).toLowerCase();
-  // Serve the pre-rendered variant asset at "/" (internal rewrite, not a redirect)
-  const res = await env.ASSETS.fetch(new URL(`/${v}`, request.url));
-  const out = new Response(res.body, res);
-  out.headers.append("Set-Cookie", `db_variant=${v}; Path=/; Max-Age=2592000`);
-  return out;
-};
+```tsx
+// src/pages/index.astro — make resolveVariant() run in the browser
+const gb = new GrowthBook({ apiHost, clientKey, attributes: { id: getOrSetVisitorId() } });
+await gb.init({ timeout: 1000 });
+const variant = gb.getFeatureValue<Variant>("booking-ux", "A");
+// then mount <VariantA/B/C> for `variant` (client:only) and report exposure to GrowthBook
 ```
 
-**Option 2 — Client assignment.** Render all three islands at `/` and have the
-GrowthBook lookup in `resolveVariant()` pick which one mounts on the client.
-
-Either way, **only the resolver changes.** `npm i @growthbook/growthbook` to add the SDK.
+To avoid a flash, gate the islands behind the resolved value (render nothing until
+GrowthBook returns) or persist the assignment in a cookie/localStorage so repeat
+visits are instant. Bucketing reporting (`gb.setTrackingCallback`) is where the A/B/C
+exposure event gets sent to your analytics.
 
 ## Project layout
 
@@ -91,9 +82,10 @@ src/
     variant.ts          # ← the swappable A/B/C flag seam
     types.ts            # shared data model (Selection, SettingOption, DayOption)
     useBookingFlow.ts   # shared 5-step state machine
-    share.ts            # Google Calendar URL + Web Share helpers
+    share.ts            # Google Calendar URL + Web Share + localStorage helpers
+    variantMeta.ts      # per-variant <title> + web font
   data/variants.ts      # per-variant options / days / times
   components/variants/   # VariantA.tsx, VariantB.tsx, VariantC.tsx
   layouts/Base.astro
-  pages/                # index.astro (resolver) + a/b/c.astro
+  pages/index.astro      # the only route — renders the resolved variant in place
 ```

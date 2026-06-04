@@ -6,15 +6,15 @@ import VariantC from "../components/variants/VariantC.tsx";
 import { resolveVariant } from "../lib/variant";
 import { VARIANT_FONT, VARIANT_TITLE } from "../lib/variantMeta";
 
-// Render the resolved variant IN PLACE at "/" — no redirect.
+// Render the resolved variant IN PLACE at "/" — there are no separate routes.
 // With the hard-coded flag this is evaluated at BUILD time, so "/" is a static
 // page that contains only the chosen variant (and only that variant's island
 // + font ship to the browser).
 //
-// Later (GrowthBook A/B/C): assign per-visitor at the edge with a Cloudflare
-// Pages Function that internally REWRITES "/" to the pre-rendered /a | /b | /c
-// asset (the URL stays "/", still no client redirect). Only that function +
-// resolveVariant() change; every variant component stays untouched.
+// Later (GrowthBook A/B/C): make the assignment per-visitor on the client —
+// render all three islands here and have resolveVariant() (called in the
+// browser) decide which one mounts, gated on the GrowthBook feature value.
+// Only the resolver + this render gate change; the variant components stay as-is.
 const variant = resolveVariant();
 ---
 
