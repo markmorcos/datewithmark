@@ -4,9 +4,9 @@ import type { Variant } from "./variant";
 // direct-access routes so the title + web font live in exactly one place.
 
 export const VARIANT_TITLE: Record<Variant, string> = {
-  A: "Will you go out with me? · Datebloom",
-  B: "so... dinner? · Datebloom",
-  C: "An evening, if you're free · Datebloom",
+  A: "Will you go out with me? · Date with Mark",
+  B: "so... dinner? · Date with Mark",
+  C: "An evening, if you're free · Date with Mark",
 };
 
 export const VARIANT_FONT: Record<Variant, string> = {

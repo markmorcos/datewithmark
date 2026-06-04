@@ -64,11 +64,11 @@ export interface StoredBooking {
 export function saveBooking(b: StoredBooking) {
   if (typeof localStorage === "undefined") return;
   try {
-    const KEY = "datebloom:bookings";
+    const KEY = "datewithmark:bookings";
     const list = JSON.parse(localStorage.getItem(KEY) ?? "[]") as unknown[];
     list.push({ ...b, savedAt: new Date().toISOString() });
     localStorage.setItem(KEY, JSON.stringify(list));
-    localStorage.setItem("datebloom:lastBooking", JSON.stringify(b));
+    localStorage.setItem("datewithmark:lastBooking", JSON.stringify(b));
   } catch {
     /* storage unavailable (private mode / quota) — non-fatal */
   }
@@ -92,7 +92,7 @@ export async function sharePlan(text: string) {
   const url = typeof location !== "undefined" ? location.href : "";
   if (typeof navigator !== "undefined" && navigator.share) {
     try {
-      await navigator.share({ title: "Datebloom", text, url });
+      await navigator.share({ title: "Date with Mark", text, url });
       return;
     } catch {
       /* user cancelled — fall through */

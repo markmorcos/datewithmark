@@ -1,4 +1,4 @@
-# Datebloom
+# Date with Mark
 
 A date-invitation + booking flow shipped as **three UX concepts (A/B/C)** so we can
 run an experiment. Today a **hard-coded flag** picks which concept renders; later it

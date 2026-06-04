@@ -1,18 +1,18 @@
 # Values for the shared "infrastructure" Helm chart (oci://ghcr.io/markmorcos/infrastructure).
 # Deployed by infrastructure/scripts/deploy.sh, which reads version/namespace/project here:
-#   helm upgrade --install datebloom \
+#   helm upgrade --install datewithmark \
 #     oci://ghcr.io/markmorcos/infrastructure --version <version> \
-#     -f deployment.yaml -n datebloom --create-namespace --history-max=3
+#     -f deployment.yaml -n datewithmark --create-namespace --history-max=3
 
 version: 0.6.2
 
-namespace: datebloom
-project: "datebloom"
+namespace: datewithmark
+project: "datewithmark"
 
 services:
   - name: web
-    image: ghcr.io/markmorcos/datebloom
-    # tag omitted -> chart defaults to "<namespace>-latest" (datebloom-latest)
+    image: ghcr.io/markmorcos/datewithmark
+    # tag omitted -> chart defaults to "<namespace>-latest" (datewithmark-latest)
     port: 80
     replicas: 2
     resources:
