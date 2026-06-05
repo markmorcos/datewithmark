@@ -6,6 +6,20 @@ project: datewithmark
 services:
   - name: web
     image: ghcr.io/markmorcos/datewithmark
+    # Build-time injection of the *public* experimentation SDK key (Astro inlines
+    # `PUBLIC_*` at build; this is a static site so there's no runtime env). CI's
+    # scripts/build.sh resolves this from a k8s secret in the `datewithmark`
+    # namespace and passes it as `--build-arg` (see Dockerfile). Create it once,
+    # out-of-band (like other repos), with the production SDK key from the admin
+    # UI / pod log line "production SDK key: sdk_…":
+    #   kubectl -n datewithmark create secret generic experimentation-sdk \
+    #     --from-literal=SDK_KEY=sdk_xxx
+    buildArgs:
+      - name: PUBLIC_EXP_SDK_KEY
+        valueFrom:
+          secretKeyRef:
+            name: experimentation-sdk
+            key: SDK_KEY
     port: 80
     ingress:
       host: datewithmark.com

@@ -2,12 +2,13 @@ import { useEffect, useState } from "preact/hooks";
 import { useBookingFlow } from "../../lib/useBookingFlow";
 import { variantB as data } from "../../data/variants";
 import { INVITER_EMAIL, appleCalDownload, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
+import type { VariantProps } from "../../lib/types";
 
 /**
  * Variant B — "Neon Playful"
  * Dark navy bg, lime + hot-pink accents, bold lowercase grotesk, glow.
  */
-export default function VariantB() {
+export default function VariantB({ onConfirm }: VariantProps = {}) {
   const flow = useBookingFlow({ setting: "dinner", day: "fri13", time: "7:30 PM" });
   const { step, selection, next, back, select } = flow;
   const choice = resolveChoice(data.settings, data.days, data.times, selection);
@@ -239,12 +240,16 @@ export default function VariantB() {
                 href={googleCalUrl(calEvent)}
                 target="_blank"
                 rel="noopener"
+                onClick={() => onConfirm?.()}
                 class="glow-pink block w-full rounded-full bg-[#ff4fa3] py-4 text-center text-base font-extrabold lowercase text-black active:scale-[0.98]"
               >
                 google calendar
               </a>
               <button
-                onClick={() => appleCalDownload(calEvent)}
+                onClick={() => {
+                  onConfirm?.();
+                  appleCalDownload(calEvent);
+                }}
                 class="mt-3 block w-full rounded-full border border-white/20 py-4 text-base font-bold lowercase text-white active:scale-[0.98]"
               >
                 apple calendar

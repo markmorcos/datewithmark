@@ -2,12 +2,13 @@ import { useEffect } from "preact/hooks";
 import { useBookingFlow } from "../../lib/useBookingFlow";
 import { variantA as data } from "../../data/variants";
 import { INVITER_EMAIL, appleCalDownload, googleCalUrl, resolveChoice, saveBooking, sharePlan } from "../../lib/share";
+import type { VariantProps } from "../../lib/types";
 
 /**
  * Variant A — "Warm Romantic"
  * Peach gradient, fat serif italic headlines, coral accent, hearts.
  */
-export default function VariantA() {
+export default function VariantA({ onConfirm }: VariantProps = {}) {
   const flow = useBookingFlow({ setting: "dinner", day: "fri13", time: "7:00 PM" });
   const { step, selection, next, back, select } = flow;
   const choice = resolveChoice(data.settings, data.days, data.times, selection);
@@ -215,12 +216,16 @@ export default function VariantA() {
                 href={googleCalUrl(calEvent)}
                 target="_blank"
                 rel="noopener"
+                onClick={() => onConfirm?.()}
                 class="block w-full rounded-full bg-[#f26b5e] py-4 text-center text-base font-semibold text-white shadow-lg shadow-[#f26b5e]/30 active:scale-[0.98]"
               >
                 Add to Google Calendar
               </a>
               <button
-                onClick={() => appleCalDownload(calEvent)}
+                onClick={() => {
+                  onConfirm?.();
+                  appleCalDownload(calEvent);
+                }}
                 class="mt-3 block w-full rounded-full border border-[#f26b5e] py-4 text-base font-semibold text-[#f26b5e] active:scale-[0.98]"
               >
                 Add to Apple Calendar

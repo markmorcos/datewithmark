@@ -30,3 +30,12 @@ export interface Selection {
 /** Ordered steps shared by every variant. */
 export const STEPS = ["invite", "setting", "day", "time", "confirm"] as const;
 export type Step = (typeof STEPS)[number];
+
+/** Props shared by the three concept components (VariantA/B/C). */
+export interface VariantProps {
+  /**
+   * Fired when she taps an add-to-calendar action on the confirm screen — the
+   * experiment's conversion. Wired by `DateApp` to `track("date_confirmed", …)`.
+   */
+  onConfirm?: () => void;
+}

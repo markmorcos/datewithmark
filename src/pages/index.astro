@@ -1,30 +1,23 @@
 ---
 import Base from "../layouts/Base.astro";
-import VariantA from "../components/variants/VariantA.tsx";
-import VariantB from "../components/variants/VariantB.tsx";
-import VariantC from "../components/variants/VariantC.tsx";
-import { resolveVariant } from "../lib/variant";
-import { VARIANT_FONT, VARIANT_TITLE } from "../lib/variantMeta";
+import DateApp from "../components/DateApp.tsx";
+import { VARIANT_FONT } from "../lib/variantMeta";
 
-// Render the resolved variant IN PLACE at "/" — there are no separate routes.
-// With the hard-coded flag this is evaluated at BUILD time, so "/" is a static
-// page that contains only the chosen variant (and only that variant's island
-// + font ship to the browser).
-//
-// Later (GrowthBook A/B/C): make the assignment per-visitor on the client —
-// render all three islands here and have resolveVariant() (called in the
-// browser) decide which one mounts, gated on the GrowthBook feature value.
-// Only the resolver + this render gate change; the variant components stay as-is.
-const variant = resolveVariant();
+// `/` is the only route. The active concept is no longer chosen at build time —
+// the <DateApp> island resolves it PER-VISITOR in the browser from the
+// experimentation platform (experiment `date_flow_variant`), fires the exposure
+// event, and renders the matching concept. So this page is a thin static shell:
+// it preloads all three concepts' web fonts (the unused ones never fetch their
+// woff2, since only the rendered variant's font-family classes are used) and
+// mounts the island, which swaps in the real <title> once the variant resolves.
+const FONTS = [VARIANT_FONT.A, VARIANT_FONT.B, VARIANT_FONT.C];
 ---
 
-<Base title={VARIANT_TITLE[variant]}>
+<Base title="Date with Mark">
   <Fragment slot="head">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href={VARIANT_FONT[variant]} rel="stylesheet" />
+    {FONTS.map((href) => <link href={href} rel="stylesheet" />)}
   </Fragment>
-  {variant === "A" && <VariantA client:load />}
-  {variant === "B" && <VariantB client:load />}
-  {variant === "C" && <VariantC client:load />}
+  <DateApp client:load />
 </Base>
