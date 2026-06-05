@@ -1,35 +1,46 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // THE VARIANT SEAM — the single source of truth for which A/B/C concept renders.
 //
-// Right now this is a HARD-CODED flag. To run the real experiment later, replace
-// the body of `resolveVariant()` with a GrowthBook lookup (see README → "Swapping
-// in GrowthBook"). Nothing else in the app needs to change: every page and
-// component goes through `resolveVariant()` and the `/a` `/b` `/c` routes.
+// The active concept now comes from the self-hosted experimentation platform
+// (experiment `date_flow_variant`), resolved PER-VISITOR IN THE BROWSER — not a
+// build-time flag. The platform names its variants by concept
+// (`sunset` / `midnight` / `linen`); the app renders them as VariantA/B/C. This
+// file holds that mapping and the control fallback. See `useDateVariant` +
+// `DateApp.tsx` for the fetch/render gate, and `experimentation.ts` for the SDK.
 // ─────────────────────────────────────────────────────────────────────────────
 
+/** The three UX concepts as rendered by VariantA/B/C. */
 export type Variant = "A" | "B" | "C";
 
 export const VARIANTS: readonly Variant[] = ["A", "B", "C"] as const;
 
-/** Flip this to "A" | "B" | "C" to preview a different concept, then rebuild. */
-const HARDCODED_VARIANT: Variant = "B";
+/**
+ * The experiment's variant keys (as configured on the platform and returned by
+ * `/api/v1/config`). These are the values reported back in `track()` so that
+ * exposures and conversions bucket against the right arm.
+ */
+export type ExperimentVariant = "sunset" | "midnight" | "linen";
+
+export const EXPERIMENT_VARIANTS: readonly ExperimentVariant[] = [
+  "sunset",
+  "midnight",
+  "linen",
+] as const;
 
 /**
- * Resolve the active variant.
- *
- * Today: returns the hard-coded flag (evaluated at build time by the index page).
- *
- * Later (GrowthBook A/B/C):
- *   import { GrowthBook } from "@growthbook/growthbook";
- *   const gb = new GrowthBook({ ...config, attributes: { id: visitorId } });
- *   await gb.init();
- *   return gb.getFeatureValue<Variant>("booking-ux", "A");
+ * Control arm — also the fallback when the SDK key is missing or the platform
+ * is unreachable, so the app always renders a real concept.
  */
-export function resolveVariant(): Variant {
-  return HARDCODED_VARIANT;
-}
+export const DEFAULT_EXPERIMENT_VARIANT: ExperimentVariant = "sunset";
 
-/** Map a variant to its route path, e.g. "A" -> "/a". */
-export function variantPath(v: Variant): string {
-  return `/${v.toLowerCase()}`;
+/** Map a platform variant key to the component it renders. */
+export const EXPERIMENT_VARIANT_TO_AB: Record<ExperimentVariant, Variant> = {
+  sunset: "A", // Warm Romantic — peach gradient, fat serif italic, coral
+  midnight: "B", // Bold/Dark — near-black, neon lime + hot-pink, glow
+  linen: "C", // Minimal — cream, high-contrast serif, gold accents
+};
+
+/** Narrowing guard for an unknown variant string from the platform. */
+export function isExperimentVariant(v: unknown): v is ExperimentVariant {
+  return v === "sunset" || v === "midnight" || v === "linen";
 }
