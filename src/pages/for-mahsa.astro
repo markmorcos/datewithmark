@@ -1,0 +1,30 @@
+---
+import Base from "../layouts/Base.astro";
+import ForMahsa from "../react/forMahsa/ForMahsa.tsx";
+
+// Standalone showpiece, separate from the `/` experiment. The whole experience
+// is a React island (react-three-fiber + framer-motion) rendered client-only —
+// three.js is browser-only, so there is nothing to server-render.
+---
+
+<Base title="Future Husband — Application No. 001">
+  <Fragment slot="head">
+    <meta name="theme-color" content="#FBF7F0" />
+    <meta
+      name="description"
+      content="An official application for the position of Future Husband — submitted for the consideration of Mahsa."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,900&family=Great+Vibes&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style is:global>
+      body {
+        font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
+      }
+    </style>
+  </Fragment>
+  <ForMahsa client:only="react" />
+</Base>
