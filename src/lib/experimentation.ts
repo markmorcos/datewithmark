@@ -1,18 +1,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Experimentation platform client (browser).
 //
-// Talks to the self-hosted feature-flag + experiment platform at
-// experimentation.morcos.tech. Auth is the *client* SDK key (NOT the admin
-// token) — it ships in the browser bundle and is read-only/CORS-open by design.
+// Talks to the self-hosted feature-flag + experiment platform, now served by the
+// admin control plane at admin.morcos.tech. Auth is the *client* SDK key (NOT the
+// admin token) — it ships in the browser bundle and is read-only/CORS-open.
 //
-//   GET  /api/v1/config?key=<sdkKey>&device=<id>  -> { features, experiments }
-//   POST /api/v1/track  { key, device, experiment, variant, event } -> 204
+//   GET  /api/experimentation/v1/config?key=<sdkKey>&device=<id>  -> { features, experiments }
+//   POST /api/experimentation/v1/track  { key, device, experiment, variant, event } -> 204
 //
 // Every call here is best-effort: if the SDK key is missing or the platform is
 // unreachable, callers fall back to the control variant so the app still works.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const API = "https://experimentation.morcos.tech";
+const API = "https://admin.morcos.tech";
 
 /** Injected at build time (Astro inlines `PUBLIC_*`). See env.d.ts / Dockerfile. */
 const SDK_KEY = import.meta.env.PUBLIC_EXP_SDK_KEY;
@@ -57,7 +57,7 @@ export async function loadConfig(device = deviceId()): Promise<PlatformConfig | 
   if (!SDK_KEY) return null;
   try {
     const r = await fetch(
-      `${API}/api/v1/config?key=${encodeURIComponent(SDK_KEY)}&device=${encodeURIComponent(device)}`,
+      `${API}/api/experimentation/v1/config?key=${encodeURIComponent(SDK_KEY)}&device=${encodeURIComponent(device)}`,
     );
     if (!r.ok) return null;
     return (await r.json()) as PlatformConfig;
@@ -74,7 +74,7 @@ export async function loadConfig(device = deviceId()): Promise<PlatformConfig | 
 export function track(event: string, variant: string, device = deviceId()): void {
   if (!SDK_KEY) return;
   try {
-    void fetch(`${API}/api/v1/track`, {
+    void fetch(`${API}/api/experimentation/v1/track`, {
       method: "POST",
       keepalive: true,
       headers: { "Content-Type": "application/json" },
