@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { finale } from "../content";
 import CssRing from "../CssRing";
+import { gmailWebUrl, openEmailDraft } from "../email";
 
 function HeartBurst() {
   const hearts = Array.from({ length: 26 });
@@ -32,12 +33,9 @@ function HeartBurst() {
 export default function Finale() {
   const [said, setSaid] = useState(false);
 
-  const { to, subject, body } = finale.yes.email;
-  // Opens Gmail's web compose window (not the OS mail client) with everything
-  // pre-filled. New tab so the page stays open behind it.
-  const gmailHref =
-    `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}` +
-    `&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  // Right-click / no-JS target; the click handler does the smart per-device
+  // routing (Gmail app on mobile, Gmail web on desktop / as fallback).
+  const gmailHref = gmailWebUrl(finale.yes.email);
 
   return (
     <section className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 py-20">
@@ -127,7 +125,11 @@ export default function Finale() {
                   href={gmailHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openEmailDraft(finale.yes.email);
+                  }}
                   className="mt-7 inline-block rounded-full bg-[#E8527E] px-8 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#E8527E]/30 transition active:scale-95"
                 >
                   💌 {finale.yes.emailCta}
