@@ -29,32 +29,38 @@ function Card({
       }}
       whileTap={front ? { cursor: "grabbing" } : undefined}
     >
-      <div className="flex h-full flex-col justify-between rounded-[2rem] border border-[#f0d9e2] bg-white p-7 shadow-[0_20px_60px_-25px_rgba(232,82,126,0.5)]">
-        <div className="flex items-start justify-between">
-          <span className="rounded-full bg-[#fbe7ee] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#E8527E]">
-            {card.tag}
-          </span>
-          <span className="text-4xl">{card.emoji}</span>
-        </div>
-        <div>
-          <h3 className="font-display text-2xl font-black text-[#1a1517]">{card.title}</h3>
-          <ul className="mt-4 space-y-2.5">
+      <div className="relative h-full overflow-hidden rounded-[2rem] border border-[#f0d9e2] bg-[#1a1517] shadow-[0_20px_60px_-25px_rgba(232,82,126,0.5)]">
+        <img
+          src={card.photo}
+          alt={card.title}
+          draggable={false}
+          className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/5" />
+
+        <span className="absolute left-5 top-5 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#E8527E]">
+          {card.tag}
+        </span>
+        {front && (
+          <motion.div
+            style={{ opacity: likeOpacity }}
+            className="absolute right-5 top-5 -rotate-12 rounded-lg border-4 border-[#3ec98b] px-3 py-1 text-xl font-black uppercase tracking-wider text-[#3ec98b]"
+          >
+            Like
+          </motion.div>
+        )}
+
+        <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+          <h3 className="font-display text-2xl font-black drop-shadow-lg">{card.title}</h3>
+          <ul className="mt-3 space-y-1.5">
             {card.lines.map((l) => (
-              <li key={l} className="flex items-start gap-2 text-sm text-[#5a4a4f]">
-                <span className="mt-0.5 text-[#E8527E]">♥</span>
+              <li key={l} className="flex items-start gap-2 text-sm text-white/90">
+                <span className="mt-0.5 text-[#ff86ad]">♥</span>
                 {l}
               </li>
             ))}
           </ul>
         </div>
-        {front && (
-          <motion.div
-            style={{ opacity: likeOpacity }}
-            className="absolute right-7 top-20 -rotate-12 rounded-lg border-4 border-[#3ec98b] px-3 py-1 text-xl font-black uppercase tracking-wider text-[#3ec98b]"
-          >
-            Like
-          </motion.div>
-        )}
       </div>
     </motion.div>
   );
@@ -69,7 +75,7 @@ export default function Swipe() {
     <section className="relative flex min-h-[100svh] flex-col items-center justify-center px-6 py-20">
       <SectionLabel label={swipe.label} heading={swipe.heading} sub={swipe.sub} />
 
-      <div className="relative mt-10 h-[420px] w-full max-w-sm">
+      <div className="relative mt-10 h-[470px] w-full max-w-sm">
         <AnimatePresence>
           {!done &&
             swipe.cards
