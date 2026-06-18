@@ -14,7 +14,7 @@ export const intro = {
   kicker: "OFFICIAL APPLICATION",
   title: "FUTURE HUSBAND",
   script: "Application",
-  subtitle: `No. ${APPLICATION_NO} — submitted for the consideration of ${HER_NAME}`,
+  subtitle: `No. ${APPLICATION_NO}, submitted for the consideration of ${HER_NAME}`,
   hint: "scroll to review the candidate",
 };
 
@@ -30,9 +30,9 @@ export const swipe = {
       title: `${HIS_NAME} · Berlin (via Cairo)`,
       photo: "/photos/1.jpeg",
       lines: [
-        "Senior software engineer — I debug feelings too",
+        "Senior software engineer, I debug feelings too",
         "Cairo-born, Berlin-based, ready to travel anywhere with you",
-        "Funniest in my mother tongue — you'll see",
+        "Funniest in my mother tongue, you'll see",
       ],
     },
     {
@@ -41,7 +41,7 @@ export const swipe = {
       photo: "/photos/2.jpeg",
       lines: [
         "Kind, loyal, and actually empathetic",
-        "Here to settle — sounds like we want the same thing",
+        "Here to settle, sounds like we want the same thing",
         "Picks you over the group chat, every time",
       ],
     },
@@ -51,7 +51,7 @@ export const swipe = {
       photo: "/photos/3.jpeg",
       lines: [
         "I play piano and I'll fly anywhere you point at a map",
-        "Yes, I dance — saw your moves, I'm in",
+        "Yes, I dance. Saw your moves, I'm in",
         "Love language: physical touch & acts of service",
       ],
     },
@@ -65,7 +65,7 @@ export const interview = {
   label: "PART TWO",
   heading: "A Job Interview",
   sub: "For the position of: Husband (full-time, lifetime contract).",
-  status: "Open to work — and only this role.",
+  status: "Open to work, and only this role.",
   skills: [
     { name: "Kindness", value: 100 },
     { name: "Loyalty", value: 100 },
@@ -75,7 +75,7 @@ export const interview = {
   ],
   quals: [
     "Reference available: my own heart, fully committed",
-    "Notice period: none — I'm ready to settle",
+    "Notice period: none, I'm ready to settle",
     "Relocation: Cairo → Berlin already done; anywhere you are next",
     "Salary expectation: your happiness",
   ],
@@ -85,9 +85,9 @@ export const interview = {
 export const pitch = {
   label: "PART THREE",
   heading: "A Shark Tank Pitch",
-  sub: "And now — the ask.",
+  sub: "And now, the ask.",
   deck: [
-    { k: "THE ASK", v: "One date.", note: "Space to actually get to know each other — beyond small talk." },
+    { k: "THE ASK", v: "One date.", note: "Space to actually get to know each other, beyond small talk." },
     { k: "THE EQUITY", v: "100% of my heart", note: "No dilution. No exit." },
     { k: "THE MARKET", v: "Just us", note: "Aligned on the husband-wife thing." },
     { k: "TRACTION", v: "Already impressed", note: "Your boldness had me at the application." },
@@ -102,9 +102,9 @@ export const finale = {
   title: `${HER_NAME},`,
   // The personal note. Replace with your own words — this is the heart of it.
   message: [
-    "I'll be honest: we never actually met. I saw you taking applications on Instagram and thought — that's the most fun idea I've seen in ages. So here's mine.",
+    "I'll be honest: we never actually met. I saw you taking applications on Instagram and thought, that's the most fun idea I've seen in ages. So here's mine.",
     "You're bold, free, and open in a way that's genuinely rare. The dancing didn't hurt. Neither did the looks.",
-    "I think we'd have a ridiculous amount of fun together — and I'm not just here to play. I want to settle, and it sounds like we're aligned on the whole husband-and-wife thing.",
+    "I think we'd have a ridiculous amount of fun together, and I'm not just here to play. I want to settle, and it sounds like we're aligned on the whole husband-and-wife thing.",
     "So I don't want the next date. I want all of them.",
   ],
   signoff: "All my heart,",
@@ -116,7 +116,7 @@ export const finale = {
     sub: "I was hoping you'd say that.",
     // Tapping this opens her mail app, pre-addressed to you, subject + body
     // filled in. She can edit before hitting send.
-    emailCta: "make it official — email me",
+    emailCta: "make it official, email me",
     email: {
       to: "me@datewithmark.com",
       subject: "I said yes 💍",
@@ -125,7 +125,7 @@ export const finale = {
         "",
         "Yes. To the date, and to all the ones after it.",
         "",
-        "— " + HER_NAME,
+        "- " + HER_NAME,
       ].join("\n"),
     },
   },
