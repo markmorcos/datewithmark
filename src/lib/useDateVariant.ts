@@ -6,6 +6,26 @@ import {
   type ExperimentVariant,
 } from "./variant";
 
+/** Letters → platform keys, so `?variant=a` works as well as `?variant=sunset`. */
+const LETTER_TO_VARIANT: Record<string, ExperimentVariant> = {
+  a: "sunset",
+  b: "midnight",
+  c: "linen",
+};
+
+/**
+ * Dev/testing escape hatch: `?variant=sunset|midnight|linen` (or a|b|c) forces a
+ * concept locally, bypassing the platform assignment. Returns null when absent.
+ */
+function variantOverride(): ExperimentVariant | null {
+  if (typeof location === "undefined") return null;
+  const raw = new URLSearchParams(location.search).get("variant");
+  if (!raw) return null;
+  const lower = raw.toLowerCase();
+  if (isExperimentVariant(lower)) return lower;
+  return LETTER_TO_VARIANT[lower] ?? null;
+}
+
 export interface DateVariant {
   /** The resolved experiment arm, or null while config is still loading. */
   variant: ExperimentVariant | null;
@@ -28,6 +48,12 @@ export function useDateVariant(): DateVariant {
 
   useEffect(() => {
     let active = true;
+    const forced = variantOverride();
+    if (forced) {
+      setVariant(forced);
+      track("exposure", forced);
+      return;
+    }
     loadConfig().then((config) => {
       if (!active) return;
       const raw = config?.experiments?.[EXPERIMENT]?.variant;
